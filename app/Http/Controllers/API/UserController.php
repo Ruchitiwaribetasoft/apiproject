@@ -21,12 +21,12 @@ class UserController extends Controller
     {
         $role = $request->role;
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
+            'name'     => 'required',
+            'email'    => 'required|email',
             'password' => 'required',
         ]);
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
+        if ($validator->fails()) { 
+            return response()->json(['error'=>$validator->errors()], 401);  
         }
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
@@ -34,58 +34,60 @@ class UserController extends Controller
         $user->assignRole($role);
         $oClient = OClient::where('password_client', 1)->first();
         $registertokens= Helper::getTokenAndRefreshToken($oClient,$user->email, $request->password);
-        return $registertokens;
+        if($registertokens){
+            return response()->json($registertokens, 200);
+        }else{
+            return response()->json([ 
+                'status' => 'error',
+            ]);
+        }
     }
 
-    ///login
+    /**
+     * [ login ]
+    */
     public function login(Request $request)
     {
         $authCheck = Auth::attempt(['email' => $request->email, 'password' => $request->password]);
         if($authCheck){
             $user = Auth::user();
             $oClient = OClient::where('password_client', 1)->first();
-            $helpertokens= Helper::getTokenAndRefreshToken($oClient,$user->email, $request->password);
-            return response()->json($helpertokens, 200);
+            $logintokens= Helper::getTokenAndRefreshToken($oClient,$user->email, $request->password);
+            return response()->json($logintokens, 200);
         }
         else{
             return response()->json([
-                'status' => false,
-            ], 500);
+                'status' =>'error',
+            ]);
         }
     }
-
-    //update user profile
-    public function userprofiles(Request $request){
+   
+    /**
+     * [update user profile]
+     */
+    
+    public function userProfiles(Request $request){
         $validator = Validator::make($request->all(), [
-            'age' => 'required',
+            'age'    => 'required',
             'gender' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image'  => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
+        if ($validator->fails()) { 
+            return response()->json(['error'=>$validator->errors()], 401);  
         }
+
         $imageupload = $request->file('image')->store('images');
         $input = $request->all();
         $input['image'] = $imageupload;
         $userid['user_id'] = Auth::user()->id;
-        $post= UserProfiles::updateOrCreate($userid,$input);
-        return "successfull";
-    }
-
-    //doctor schedule
-    public function doctorschedule(Request $request){
-        $validator = Validator::make($request->all(), [
-            'day' => 'required',
-            'start_time' => 'required',
-            'end_time' => 'required',
-        ]);
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
+        $UpdateProfile= UserProfiles::updateOrCreate($userid,$input);
+        if($UpdateProfile){
+            return response()->json(['success' =>"successfull"], 200);
+        }else{
+            return response()->json([ 
+                'status' => 'error',
+            ]);
         }
-        $input = $request->all();
-        $userid['user_id'] = Auth::user()->id;
-        $post= DoctorSchedules::updateOrCreate($userid,$input);
-        return "Doctor Schedule Inserted";
     }
 }
 
