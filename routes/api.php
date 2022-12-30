@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\DoctorSchedule;
+use App\Http\Controllers\API\UserAppointment;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,11 +25,19 @@ Route::controller(UserController::class)->group(function () {
     Route::post('register','register');
     Route::post('login','login');
     Route::post('user-profiles', 'userProfiles')->middleware('auth:api');
+    Route::post('users-listing', 'usersListing')->middleware('auth:api');
 });
 
 Route::controller(DoctorSchedule::class)->group(function () {
-    Route::post('doctor-schedules','doctorSchedule')->middleware('auth:api');
-    Route::post('doctor-listing','doctorListing')->middleware('auth:api');
-    Route::put('update-schedule/{id}','updateSchedule')->middleware('auth:api');
-    Route::put('delete-schedule/{id}','deleteSchedule')->middleware('auth:api');
+    Route::group(['middleware' => ['auth:api']], function (){ 
+        Route::post('doctor-schedules','doctorSchedule');
+        Route::post('doctor-listing','doctorListing');
+        Route::put('update-schedule/{id}','updateSchedule');
+        Route::put('delete-schedule/{id}','deleteSchedule');
+    });
+});
+
+Route::controller(UserAppointment::class)->group(function(){
+    Route::post('available-doctor','appointments')->middleware('auth:api');
+    Route::post('fix-appointment/{id}','fixAppointment')->middleware('auth:api');
 });

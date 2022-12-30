@@ -9,7 +9,9 @@ class DoctorSchedules extends Model
 {
     use HasFactory;
     protected $fillable = ['day', 'start_time','end_time','user_id'];
-    public function data(){
+    public function doctorSchedule(){
         return $this->belongsTo('App\Models\User');
     }
+
+    
 }

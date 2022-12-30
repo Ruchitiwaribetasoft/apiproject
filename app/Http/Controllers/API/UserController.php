@@ -64,7 +64,7 @@ class UserController extends Controller
    
     /**
      * [update user profile]
-     */
+    */
     
     public function userProfiles(Request $request){
         $validator = Validator::make($request->all(), [
@@ -75,10 +75,12 @@ class UserController extends Controller
         if ($validator->fails()) { 
             return response()->json(['error'=>$validator->errors()], 401);  
         }
-
-        $imageupload = $request->file('image')->store('images');
+        $imageupload = $request->file('image');
+        $imageName = $imageupload->getClientOriginalName();
+        $uploadedFile =   time() .'_'.$imageName;
+        $path = $imageupload->storeas('public/images',$uploadedFile);
         $input = $request->all();
-        $input['image'] = $imageupload;
+        $input['image'] = $uploadedFile;
         $userid['user_id'] = Auth::user()->id;
         $UpdateProfile= UserProfiles::updateOrCreate($userid,$input);
         if($UpdateProfile){
@@ -88,6 +90,28 @@ class UserController extends Controller
                 'status' => 'error',
             ]);
         }
+    }
+
+    /**
+     *    UsersListing 
+     *
+     * @param   Request  $request  [$request description]
+     *
+     * @return  [json]       
+     */
+    public function usersListing(Request $request){
+        $id    = Auth::user()->id;
+        $users = User::find($id);
+        $user  = $users->UserProfiles;
+        $imagepath = asset('storage/images/'.$user['image']);
+        $userdata = [
+            'name' =>$users['name'],
+            'email'=>$users['email'],
+            'age'  => $user['age'],
+            'gender' => $user['gender'],
+            'image'  => $imagepath,
+        ];
+        return response()->json($userdata, 200);
     }
 }
 

@@ -9,7 +9,7 @@ class UserProfiles extends Model
 {
     use HasFactory;
     protected $fillable = ['age', 'gender','image','user_id'];
-    public function data(){
+    public function extraData(){
        return $this->belongsTo('App\Models\User');
     }
     
