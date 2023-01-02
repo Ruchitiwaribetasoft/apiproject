@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DoctorSchedules extends Model
+class DoctorSchedule extends Model
 {
     use HasFactory;
     protected $fillable = ['day', 'start_time','end_time','user_id'];

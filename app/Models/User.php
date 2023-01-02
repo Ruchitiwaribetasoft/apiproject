@@ -43,11 +43,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function UserProfiles(){
-        return $this->hasOne('App\Models\UserProfiles');
+    public function UserProfile(){
+        return $this->hasOne('App\Models\UserProfile');
     }
 
-    public function DoctorSchedules(){
-        return $this->hasMany('App\Models\DoctorSchedules');
+    public function DoctorSchedule(){
+        return $this->hasMany('App\Models\DoctorSchedule');
     }
 }
