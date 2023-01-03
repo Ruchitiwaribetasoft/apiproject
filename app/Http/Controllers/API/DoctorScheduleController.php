@@ -16,8 +16,7 @@ class DoctorScheduleController extends Controller
      *
      * @return  [json]     
      */
-
-    public function doctorSchedule(Request $request){
+    public function doctorSchedule(Request $request){   
         $validator = Validator::make($request->all(), [
             'day'        => 'required',
             'start_time' => 'required',
@@ -55,7 +54,6 @@ class DoctorScheduleController extends Controller
      *   Doctor Schedule
      *
      */
-
     public function doctorData() {
         $id    = Auth::user()->id;
         $login_user = User::find($id);
@@ -77,7 +75,6 @@ class DoctorScheduleController extends Controller
     /**
      *   Edit Schedule
     */
-    
     public function updateSchedule(Request $request,$id) {
         $validator = Validator::make($request->all(), [
             'day'        => 'required',
@@ -95,27 +92,27 @@ class DoctorScheduleController extends Controller
             'start_time' => $input['start_time'],
             'end_time'   => $input['end_time'],
         ])->exists();
-            if($check_data){
+        if($check_data){
+            return response()->json([
+                'status'  => false,
+                'message' =>  "Data Already Exist"
+            ]);
+        }else{
+            $input =  $request->all();
+            $input['user_id'] = Auth::user()->id;
+            $findUser = DoctorSchedule::find($id);
+            if($findUser->update($input)){
                 return response()->json([
-                    'status'  => false,
-                    'message' =>  "Data Already Exist"
-                ]);
+                    'status'  => true,
+                    'message' => "Update Successfull"
+                ], 200);
             }else{
-                $input =  $request->all();
-                $input['user_id'] = Auth::user()->id;
-                $findUser = DoctorSchedule::find($id);
-                if($findUser->update($input)){
-                    return response()->json([
-                        'status'  => true,
-                        'message' => "Update Successfull"
-                    ], 200);
-                }else{
-                    return response()->json([ 
-                        'status'  => false,
-                        'message' => "Error"
-                    ]);
-                }
+                return response()->json([ 
+                    'status'  => false,
+                    'message' => "Error"
+                ]);
             }
+        }
      }
 
     /**
@@ -136,5 +133,4 @@ class DoctorScheduleController extends Controller
             ]);
         }
     }
-
 }

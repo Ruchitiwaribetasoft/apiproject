@@ -75,7 +75,6 @@ class UserController extends Controller
     /**
      * [update user profile]
     */
-    
     public function updateProfiles(Request $request){
         $validator = Validator::make($request->all(), [
             'age'    => 'required',

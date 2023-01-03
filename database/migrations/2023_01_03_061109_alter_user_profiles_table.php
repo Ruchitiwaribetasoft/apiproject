@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('user_profiles', function (Blueprint $table) {
-            $table->integer('user_id')->after('id')->change();
+            $table->bigInteger('user_id')->after('id');
         });
     }
 
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        
     }
 };

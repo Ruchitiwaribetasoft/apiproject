@@ -13,29 +13,36 @@ class UserAppointmentController extends Controller
 {
     public function checkAvailability(Request $request)
     {
-        $date       = $request->date;
-        $start_time = $request->start_time;
-        $end_time   = $request->end_time;
-        $day = Carbon::createFromFormat('d/m/Y', $date)->format('l');
-        $schedule = DoctorSchedule::where([
-            'day' => $day,
-        ])->where(  
-            'start_time','<=',$start_time,
-        )->where(
-            'end_time','>=',$end_time
-        )->get();
-        
-        if($schedule){
-            return response()->json([
-                'status'     => true,
-                'message'    => "Available Schedule",
-                'DoctorData' => $schedule,
-            ],200);
-        }else{
+        $date = $request->date;
+        if(Carbon::now()->startOfDay()->gte($date)){
             return response()->json([
                 'status'  => false,
-                'message' => "Schedule not match"
+                'message' =>  "Invalid date"
             ]);
+        }else{
+            $start_time = $request->start_time;
+            $end_time   = $request->end_time;
+            $day = Carbon::createFromFormat('d-m-Y', $date)->format('l');
+            $schedule = DoctorSchedule::where([
+                'day' => $day,
+            ])->where(  
+                'start_time','<=',$start_time,
+            )->where(
+                'end_time','>=',$end_time
+            )->get();
+            
+            if($schedule){
+                return response()->json([
+                    'status'     => true,
+                    'message'    => "Available Schedule",
+                    'DoctorData' => $schedule,
+                ],200);
+            }else{
+                return response()->json([
+                    'status'  => false,
+                    'message' => "Schedule not match"
+                ]);
+            }
         }
     }
 
